@@ -46,6 +46,11 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
     const handleSubmitTicket = async () => {
         if (ticket.whatsappNumber && !ticket.consent) return alert("Please check the consent box.");
 
+        // Limit Open Tickets Check
+        if (stats.open >= 5) {
+            return alert("You have reached the limit of 5 open tickets. Please wait for some to be resolved.");
+        }
+
         // Basic Phone Validation (10-15 digits, optional +)
         const phoneRegex = /^\+?[0-9]{10,15}$/;
         if (ticket.whatsappNumber && !phoneRegex.test(ticket.whatsappNumber.replace(/\s/g, ''))) {
