@@ -1,0 +1,67 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model User {
+  id             BigInt    @id @default(autoincrement())
+  email          String    @unique
+  whatsappNumber String?   @map("whatsapp_number")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  lastLoginAt    DateTime? @map("last_login_at")
+  tickets        Ticket[]
+
+  @@map("users")
+}
+
+model Admin {
+  id              BigInt   @id @default(autoincrement())
+  email           String   @unique
+  password        String   @map("password_hash") // Hashed
+  name            String?
+  role            String   @default("admin") // 'super-admin', 'admin'
+  specialization  String?  @default("General") // 'General', 'Technical', 'Academic', 'Billing'
+  queriesResolved Int      @default(0) @map("queries_resolved")
+  averageRating   Float    @default(0.0) @map("average_rating")
+  createdAt       DateTime @default(now()) @map("created_at")
+  resolvedTickets Ticket[] @relation("ResolvedBy")
+  forwardedTickets Ticket[] @relation("ForwardedBy")
+  pendingTransfers Ticket[] @relation("PendingTransferTo")
+
+  @@map("admins")
+}
+
+model Ticket {
+  id           String    @id @default(uuid())
+  userId       BigInt    @map("user_id")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category     String
+  description  String
+  status       String    @default("Open")
+  
+  resolvedById BigInt?   @map("resolved_by_id")
+  resolvedBy   Admin?    @relation("ResolvedBy", fields: [resolvedById], references: [id])
+  
+  forwardedById BigInt?  @map("forwarded_by_id")
+  forwardedBy   Admin?   @relation("ForwardedBy", fields: [forwardedById], references: [id])
+
+  pendingTransferToId BigInt? @map("pending_transfer_to_id")
+  pendingTransferTo   Admin?  @relation("PendingTransferTo", fields: [pendingTransferToId], references: [id])
+
+  adminRemark  String?   @map("admin_remark")
+  userRating   Int?      @map("user_rating")
+  userFeedback String?   @map("user_feedback")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  resolvedAt   DateTime? @map("resolved_at")
+
+  @@index([status])
+  @@index([userId])
+  @@index([resolvedById])
+  @@map("tickets")
+}
+
