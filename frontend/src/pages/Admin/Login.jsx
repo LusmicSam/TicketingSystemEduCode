@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../../config';
 import { Loader2, Lock, Mail, ArrowRight, Shield, Sparkles, Zap, Eye, EyeOff } from 'lucide-react';
@@ -22,6 +22,9 @@ export default function AdminLogin() {
         const token = localStorage.getItem('adminToken');
         if (token) {
             navigate('/sse/educode/ad/min/dashboard', { replace: true });
+            // Safety timeout: If navigation hangs or redirects back, show login form after 2s
+            const timer = setTimeout(() => setCheckingAuth(false), 2000);
+            return () => clearTimeout(timer);
         } else {
             setCheckingAuth(false);
         }

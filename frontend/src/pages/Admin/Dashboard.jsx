@@ -49,15 +49,22 @@ export default function Dashboard() {
     const btnClass = "bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white px-4 py-2 rounded-[var(--radius-md)] font-medium transition-all shadow-lg hover:shadow-[var(--shadow-glow)] flex items-center justify-center gap-2";
 
     useEffect(() => {
-        const token = localStorage.getItem('adminToken');
-        const userStr = localStorage.getItem('adminUser');
-        if (!token || !userStr) {
+        try {
+            const token = localStorage.getItem('adminToken');
+            const userStr = localStorage.getItem('adminUser');
+            if (!token || !userStr) {
+                navigate('/sse/educode');
+                return;
+            }
+            setAdminUser(JSON.parse(userStr));
+            fetchStats();
+            fetchAdmins();
+        } catch (error) {
+            console.error("Auth Parsing Error:", error);
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
             navigate('/sse/educode');
-            return;
         }
-        setAdminUser(JSON.parse(userStr));
-        fetchStats();
-        fetchAdmins();
     }, []);
 
     useEffect(() => {
