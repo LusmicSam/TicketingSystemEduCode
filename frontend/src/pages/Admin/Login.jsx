@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../../config';
 import { Lock, Loader2 } from 'lucide-react';
+import { useAlert } from '../../components/AlertContext';
 
 export default function AdminLogin() {
+    const { showAlert } = useAlert();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -25,10 +27,10 @@ export default function AdminLogin() {
                 localStorage.setItem('adminUser', JSON.stringify(data.admin));
                 navigate('/sse/educode/ad/min/dashboard');
             } else {
-                alert(data.error);
+                showAlert(data.error, 'error');
             }
         } catch (err) {
-            alert('Login failed');
+            showAlert('Login failed', 'error');
         } finally {
             setLoading(false);
         }

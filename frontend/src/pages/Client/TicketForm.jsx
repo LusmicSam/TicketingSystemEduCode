@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { MessageCircle, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import logo from '../../assets/educode_logo.png';
 import StudentDashboard from './StudentDashboard';
+import { useAlert } from '../../components/AlertContext';
 
 export default function TicketForm() {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState('');
     const [loading, setLoading] = useState(false);
+    const { showAlert } = useAlert();
 
     // Theme Colors
     const inputClass = "w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all";
@@ -31,7 +33,7 @@ export default function TicketForm() {
                 body: JSON.stringify({ email }),
             });
             setStep(2);
-        } catch (err) { alert('Failed to send OTP'); }
+        } catch (err) { showAlert('Failed to send OTP', 'error'); }
         finally { setLoading(false); }
     };
 
@@ -48,8 +50,8 @@ export default function TicketForm() {
                 localStorage.setItem('clientToken', data.token);
                 localStorage.setItem('clientEmail', data.user.email);
                 setStep(3);
-            } else alert('Invalid OTP');
-        } catch (err) { alert('Verify Failed'); }
+            } else showAlert('Invalid OTP', 'error');
+        } catch (err) { showAlert('Verify Failed', 'error'); }
         finally { setLoading(false); }
     };
 

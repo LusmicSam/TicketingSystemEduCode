@@ -39,7 +39,7 @@ const login = async (req, res) => {
         const isValid = await bcrypt.compare(password, admin.password);
         if (!isValid) return res.status(401).json({ error: "Invalid credentials" });
 
-        const token = jwt.sign({ id: Number(admin.id), role: admin.role }, JWT_SECRET, { expiresIn: '1d' });
+        const token = jwt.sign({ id: Number(admin.id), role: admin.role }, JWT_SECRET, { expiresIn: '30d' });
 
         // Return admin info without sensitive data
         const { password: _, ...adminData } = admin;
@@ -114,8 +114,11 @@ const createSubAdmin = async (req, res) => {
 
 const getStats = async (req, res) => {
     try {
+        const adminId = req.user?.id; // Get requesting admin ID from auth middleware
+
         // Check Cache
-        const cachedStats = statsCache.get("adminStats");
+        const cacheKey = `adminStats_${adminId}`;
+        const cachedStats = statsCache.get(cacheKey);
         if (cachedStats) {
             return res.json(cachedStats);
         }
@@ -123,16 +126,47 @@ const getStats = async (req, res) => {
         const admins = await prisma.admin.findMany({
             select: { id: true, name: true, queriesResolved: true, averageRating: true }
         });
+
+        // Get ticket counts for the requesting admin
+        let myTicketsCount = 0;
+        let inboxCount = 0;
+
+        if (adminId) {
+            // Count tickets assigned to this admin (In Progress)
+            myTicketsCount = await prisma.ticket.count({
+                where: {
+                    resolvedById: adminId,
+                    status: 'In Progress'
+                }
+            });
+
+            // Count tickets pending transfer to this admin
+            inboxCount = await prisma.ticket.count({
+                where: {
+                    pendingTransferToId: adminId,
+                    status: 'In Progress'
+                }
+            });
+        }
+
         // Serialize BigInt
-        const startData = JSON.parse(JSON.stringify(admins, (key, value) =>
+        const statsData = JSON.parse(JSON.stringify(admins, (key, value) =>
             typeof value === 'bigint' ? value.toString() : value
         ));
 
-        // Set Cache
-        statsCache.set("adminStats", startData);
+        // Add badge counts to response
+        const responseData = {
+            stats: statsData,
+            myTicketsCount,
+            inboxCount
+        };
 
-        res.json(startData);
+        // Set Cache with admin-specific key
+        statsCache.set(cacheKey, responseData);
+
+        res.json(responseData);
     } catch (error) {
+        console.error('Error fetching stats:', error);
         res.status(500).json({ error: "Error fetching stats" });
     }
 };

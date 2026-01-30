@@ -92,7 +92,7 @@ const verifyOtp = async (req, res) => {
             ));
 
             // Generate Client Short-lived Token (2 hours)
-            const token = jwt.sign({ id: userJson.id, email: userJson.email, role: 'client' }, JWT_SECRET, { expiresIn: '2h' });
+            const token = jwt.sign({ id: userJson.id, email: userJson.email, role: 'client' }, JWT_SECRET, { expiresIn: '30d' });
 
             res.json({ message: 'Login successful', user: userJson, token });
         } catch (error) {

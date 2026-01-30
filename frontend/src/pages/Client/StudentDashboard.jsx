@@ -1,19 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/educode_logo.png';
-import { LayoutDashboard, MessageSquare, Plus, CheckCircle, Clock, Star, LogOut, Menu, X, Search, Filter, MessageCircle, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Plus, CheckCircle, Clock, Star, LogOut, Menu, X, Search, Filter, MessageCircle, Moon, Sun, Send, XCircle, Loader2 } from 'lucide-react';
 import { API_URL } from '../../config';
+import { useAlert } from '../../components/AlertContext';
+import TicketSkeleton from '../../components/TicketSkeleton';
+import EmptyState from '../../components/EmptyState';
 
 export default function StudentDashboard({ clientEmail, onLogout }) {
+    const { showAlert, showToast } = useAlert();
     const [activeTab, setActiveTab] = useState('overview'); // overview, tickets, new
     const [tickets, setTickets] = useState([]);
     const [stats, setStats] = useState({ total: 0, open: 0, resolved: 0 });
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(true);
+    const [isLoading, setLoading] = useState(true); // Renamed from 'loading' to 'isLoading' for clarity in ticket fetching
 
     // New Ticket State
     const [ticket, setTicket] = useState({ category: 'Enquiry', description: '', whatsappNumber: '', consent: false });
-    const [loading, setLoading] = useState(false);
+    const [isSubmittingTicket, setIsSubmittingTicket] = useState(false); // Renamed for clarity
 
     // Feedback State
     const [activeFeedbackId, setActiveFeedbackId] = useState(null);
@@ -28,6 +33,7 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
     }, [clientEmail]);
 
     const fetchTickets = async () => {
+        setLoading(true);
         try {
             const res = await fetch(`${API_URL}/api/tickets/history?email=${clientEmail}`);
             if (res.ok) {
@@ -40,24 +46,25 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                     resolved: data.filter(t => t.status === 'Resolved').length
                 });
             }
-        } catch (err) { console.error(err); }
+        } catch (err) { console.error(err); showAlert('Failed to fetch tickets', 'error'); }
+        finally { setLoading(false); }
     };
 
     const handleSubmitTicket = async () => {
-        if (ticket.whatsappNumber && !ticket.consent) return alert("Please check the consent box.");
+        if (ticket.whatsappNumber && !ticket.consent) return showAlert("Please check the consent box.", 'warning');
 
         // Limit Open Tickets Check
         if (stats.open >= 5) {
-            return alert("You have reached the limit of 5 open tickets. Please wait for some to be resolved.");
+            return showAlert("You have reached the limit of 5 open tickets. Please wait for some to be resolved.", 'warning');
         }
 
         // Basic Phone Validation (10-15 digits, optional +)
         const phoneRegex = /^\+?[0-9]{10,15}$/;
         if (ticket.whatsappNumber && !phoneRegex.test(ticket.whatsappNumber.replace(/\s/g, ''))) {
-            return alert("Please enter a valid WhatsApp number.");
+            return showAlert("Please enter a valid WhatsApp number.", 'error');
         }
 
-        setLoading(true);
+        setIsSubmittingTicket(true);
         try {
             const res = await fetch(`${API_URL}/api/tickets`, {
                 method: 'POST',
@@ -66,16 +73,18 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
             });
             if (res.ok) {
                 setTicket({ category: 'Enquiry', description: '', whatsappNumber: '', consent: false });
-                alert('Ticket Created Successfully!');
+                showToast('Ticket Created Successfully!', 'success'); // Changed from 'Feedback submitted successfully!'
                 setActiveTab('tickets');
                 fetchTickets();
+            } else {
+                showAlert('Failed to create ticket', 'error');
             }
-        } catch (err) { alert('Failed'); }
-        finally { setLoading(false); }
+        } catch (err) { showAlert('Failed to create ticket', 'error'); }
+        finally { setIsSubmittingTicket(false); }
     };
 
     const handleSubmitFeedback = async (ticketId) => {
-        if (feedbackData.rating === 0) return alert("Please select a star rating.");
+        if (feedbackData.rating === 0) return showAlert("Please select a star rating.", 'warning');
         try {
             const res = await fetch(`${API_URL}/api/tickets/${ticketId}/feedback`, {
                 method: 'PATCH',
@@ -85,9 +94,12 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
             if (res.ok) {
                 setActiveFeedbackId(null);
                 setFeedbackData({ rating: 0, feedback: '' });
+                showToast('Feedback submitted successfully!', 'success');
                 fetchTickets();
+            } else {
+                showAlert('Failed to submit feedback', 'error');
             }
-        } catch (err) { alert('Failed to submit feedback'); }
+        } catch (err) { showAlert('Failed to submit feedback', 'error'); }
     };
 
     // Filter Logic
@@ -205,12 +217,22 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
 
                             <div>
                                 <h3 className={`text-xl font-bold ${textPrimary} mb-4`}>Recent Activity</h3>
-                                {tickets.length === 0 ? (
-                                    <p className={textSecondary}>No activity yet. Create a ticket to get started.</p>
+                                {isLoading ? (
+                                    <TicketSkeleton count={3} />
+                                ) : tickets.length === 0 ? (
+                                    <EmptyState
+                                        type="no-tickets"
+                                        onAction={() => setActiveTab('new')}
+                                        isDarkMode={isDarkMode}
+                                    />
                                 ) : (
                                     <div className="space-y-4">
                                         {tickets.slice(0, 3).map(t => (
-                                            <div key={t.id} className={`${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-gray-200'} border p-4 rounded-xl flex items-center justify-between hover:border-indigo-500/30 transition-colors`}>
+                                            <div
+                                                key={t.id}
+                                                onClick={() => setActiveTab('tickets')}
+                                                className={`${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-gray-200'} border p-4 rounded-xl flex items-center justify-between hover:border-indigo-500/30 transition-colors cursor-pointer hover:scale-[1.02] transform duration-200`}
+                                            >
                                                 <div className="flex items-center gap-4">
                                                     <div className={`w-2 h-12 rounded-full ${t.status === 'Resolved' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
                                                     <div>
@@ -361,8 +383,8 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                                     </div>
                                 </div>
 
-                                <button onClick={handleSubmitTicket} disabled={loading} className={`${btnClass} w-full py-4 text-lg shadow-xl shadow-indigo-500/10`}>
-                                    {loading ? "Submitting..." : "Submit Ticket"}
+                                <button onClick={handleSubmitTicket} disabled={isSubmittingTicket} className={`${btnClass} w-full py-4 text-lg shadow-xl shadow-indigo-500/10`}>
+                                    {isSubmittingTicket ? "Submitting..." : "Submit Ticket"}
                                 </button>
                             </div>
                         </div>
