@@ -102,11 +102,9 @@ function TicketFormContent() {
                 {/* Content */}
                 <div className="relative z-10 flex flex-col justify-center p-16">
                     <div className="flex items-center gap-4 mb-8">
-                        <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-500/30 animate-pulse-glow">
-                            <img src={logo} alt="EduCode" className="w-10 h-10 object-contain" />
-                        </div>
+                        <img src={logo} alt="TheEduCode" className="w-16 h-16 object-contain drop-shadow-xl" />
                         <div>
-                            <h1 className="text-4xl font-bold theme-text">EduCode</h1>
+                            <h1 className="text-4xl font-bold theme-text">TheEduCode</h1>
                             <p className="text-indigo-400">Student Support Portal</p>
                         </div>
                     </div>
@@ -148,8 +146,8 @@ function TicketFormContent() {
                 <div className="w-full max-w-md relative">
                     {/* Mobile Logo */}
                     <div className="lg:hidden text-center mb-8">
-                        <img src={logo} alt="EduCode" className="w-16 h-16 object-contain drop-shadow-sm mb-4" />
-                        <h1 className="text-2xl font-bold theme-text">EduCode Support</h1>
+                        <img src={logo} alt="TheEduCode" className="w-16 h-16 object-contain drop-shadow-sm mb-4" />
+                        <h1 className="text-2xl font-bold theme-text">TheEduCode Support</h1>
                     </div>
 
                     <div className="theme-surface rounded-3xl border theme-border p-8 animate-scale-in relative overflow-hidden">

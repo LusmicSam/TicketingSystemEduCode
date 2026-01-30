@@ -290,8 +290,8 @@ export default function Dashboard() {
             <nav className="theme-surface border-b theme-border sticky top-0 z-10">
                 <div className="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <img src={logo} alt="EduCode Logo" className="w-10 h-10 object-contain drop-shadow-sm" />
-                        <span className="font-bold text-lg tracking-tight theme-text">EduCode Admin</span>
+                        <img src={logo} alt="TheEduCode Logo" className="w-10 h-10 object-contain drop-shadow-sm" />
+                        <span className="font-bold text-lg tracking-tight theme-text">TheEduCode Admin</span>
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="text-right hidden sm:block">

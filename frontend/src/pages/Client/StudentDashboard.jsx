@@ -216,7 +216,7 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                     <div className="flex items-center gap-3">
                         <img src={logo} alt="EduCode" className="w-10 h-10 object-contain drop-shadow-sm" />
                         <div>
-                            <h1 className="font-semibold theme-text">EduCode</h1>
+                            <h1 className="font-semibold theme-text">TheEduCode</h1>
                             <p className="text-xs theme-text-muted">Support Portal</p>
                         </div>
                     </div>
