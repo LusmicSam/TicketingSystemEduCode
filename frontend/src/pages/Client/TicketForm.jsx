@@ -18,7 +18,7 @@ function TicketFormContent() {
     const [isVerified, setIsVerified] = useState(false);
 
     useEffect(() => {
-        const storedEmail = sessionStorage.getItem('clientEmail');
+        const storedEmail = localStorage.getItem('clientEmail');
         if (storedEmail) {
             setEmail(storedEmail);
             setIsVerified(true);
@@ -60,7 +60,7 @@ function TicketFormContent() {
             });
             const data = await res.json();
             if (res.ok) {
-                sessionStorage.setItem('clientEmail', email);
+                localStorage.setItem('clientEmail', email);
                 setIsVerified(true);
             } else {
                 showAlert(data.error || 'Verification failed', 'error');
@@ -73,7 +73,7 @@ function TicketFormContent() {
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem('clientEmail');
+        localStorage.removeItem('clientEmail');
         setIsVerified(false);
         setEmail('');
         setOtp('');
@@ -148,9 +148,7 @@ function TicketFormContent() {
                 <div className="w-full max-w-md relative">
                     {/* Mobile Logo */}
                     <div className="lg:hidden text-center mb-8">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl mb-4 shadow-lg shadow-indigo-500/30 animate-pulse-glow">
-                            <img src={logo} alt="EduCode" className="w-10 h-10 object-contain" />
-                        </div>
+                        <img src={logo} alt="EduCode" className="w-16 h-16 object-contain drop-shadow-sm mb-4" />
                         <h1 className="text-2xl font-bold theme-text">EduCode Support</h1>
                     </div>
 

@@ -214,9 +214,7 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                 {/* Logo */}
                 <div className="p-5 border-b border-[var(--color-border)]">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[var(--color-primary)] rounded-[var(--radius-md)] flex items-center justify-center shadow-sm">
-                            <img src={logo} alt="EduCode" className="w-6 h-6 object-contain" />
-                        </div>
+                        <img src={logo} alt="EduCode" className="w-10 h-10 object-contain drop-shadow-sm" />
                         <div>
                             <h1 className="font-semibold theme-text">EduCode</h1>
                             <p className="text-xs theme-text-muted">Support Portal</p>
@@ -629,16 +627,13 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="font-medium theme-text">Support Hours</h3>
-                                            <p className="theme-text-muted text-sm mt-0.5">Mon - Sat, 9 AM - 6 PM IST</p>
+                                            <p className="theme-text-muted text-sm mt-0.5">Mon - Sat, 9 AM - 9 PM IST</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* FAQ Section */}
-                            <div className="mb-6">
-                                <FAQSection />
-                            </div>
+
 
                             {/* Quick Links */}
                             <QuickLinks />

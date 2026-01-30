@@ -1,4 +1,4 @@
-import { Book, ExternalLink, FileText, Video, MessageCircle } from 'lucide-react';
+import { FileText, Monitor, Terminal, MessageCircle, Send, Command, ExternalLink } from 'lucide-react';
 
 /**
  * Quick Links / Resources Component
@@ -7,11 +7,11 @@ export default function QuickLinks({ links = defaultLinks }) {
     return (
         <div className="card p-6">
             <h3 className="font-medium theme-text mb-4 flex items-center gap-2">
-                <Book size={16} className="text-[var(--color-primary)]" />
-                Helpful Resources
+                <FileText size={16} className="text-[var(--color-primary)]" />
+                Helpful Resources & Guides
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {links.map((link, index) => (
                     <a
                         key={index}
@@ -39,35 +39,51 @@ export default function QuickLinks({ links = defaultLinks }) {
 
 const defaultLinks = [
     {
-        title: 'Documentation',
-        description: 'Learn how to use EduCode',
-        url: '#',
+        title: 'Student FAQs',
+        description: 'Common questions & answers',
+        url: 'https://drive.google.com/file/d/1D-R3yWi4l_90j0Fp9JWv6Ghc7gk-AB3j/view?usp=drivesdk',
         icon: FileText,
         iconBg: 'bg-blue-500/10',
         iconColor: 'text-blue-500'
     },
     {
-        title: 'Video Tutorials',
-        description: 'Step-by-step guides',
-        url: '#',
-        icon: Video,
-        iconBg: 'bg-purple-500/10',
-        iconColor: 'text-purple-500'
+        title: 'Installation Guide (Win)',
+        description: 'For Windows users',
+        url: 'https://drive.google.com/file/d/13JwBeZNxM3ZYfnwt4o_rWJtdjX8kDSwQ/view?usp=drivesdk',
+        icon: Monitor,
+        iconBg: 'bg-blue-500/10',
+        iconColor: 'text-blue-600'
     },
     {
-        title: 'Community Forum',
-        description: 'Connect with other learners',
-        url: '#',
+        title: 'Installation Guide (Mac)',
+        description: 'For macOS users',
+        url: 'https://drive.google.com/file/d/11FFfI2XpcXt3GcMGBct-P-Jn4aflZmvl/view?usp=drivesdk',
+        icon: Command,
+        iconBg: 'bg-gray-500/10',
+        iconColor: 'text-gray-500'
+    },
+    {
+        title: 'Installation Guide (Linux)',
+        description: 'For Linux users',
+        url: 'https://drive.google.com/file/d/1z59-iohe-ItdFJO0MCOeteykRGNdoUox/view?usp=drivesdk',
+        icon: Terminal,
+        iconBg: 'bg-orange-500/10',
+        iconColor: 'text-orange-500'
+    },
+    {
+        title: 'Join WhatsApp Group',
+        description: 'Community updates',
+        url: 'https://chat.whatsapp.com/EVv2uU0seqd9F6FpjupR9w',
         icon: MessageCircle,
         iconBg: 'bg-green-500/10',
         iconColor: 'text-green-500'
     },
     {
-        title: 'Knowledge Base',
-        description: 'Browse common solutions',
-        url: '#',
-        icon: Book,
-        iconBg: 'bg-amber-500/10',
-        iconColor: 'text-amber-500'
+        title: 'Join Telegram Channel',
+        description: 'Announcements & chat',
+        url: 'https://t.me/+txl4rk2uHpczZGY9',
+        icon: Send,
+        iconBg: 'bg-sky-500/10',
+        iconColor: 'text-sky-500'
     }
 ];
