@@ -85,6 +85,10 @@ const createTicket = async (req, res) => {
 };
 
 const getTickets = async (req, res) => {
+    console.log("🎫 getTickets called");
+    console.log("User:", req.user);
+    console.log("Query:", req.query);
+
     try {
         const { page = 1, limit = 10, status = 'All', search = '', sortBy = 'newest' } = req.query;
         const skip = (parseInt(page) - 1) * parseInt(limit);

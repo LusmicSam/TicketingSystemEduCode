@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import { API_URL } from '../../config';
 import { Search, Filter, MessageCircle, ExternalLink, UserPlus, X, LogOut, CheckCircle, Clock, AlertCircle, Star, ArrowRightCircle, Divide, Loader, Lock } from 'lucide-react';
 import logo from '../../assets/educode_logo.png';
 import { useNavigate } from 'react-router-dom';

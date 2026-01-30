@@ -31,8 +31,6 @@ const ensureSuperAdmin = async () => {
 };
 
 const login = async (req, res) => {
-    await ensureSuperAdmin(); // Ensure at least one admin exists
-
     const { email, password } = req.body;
     try {
         const admin = await prisma.admin.findUnique({ where: { email } });
@@ -52,8 +50,9 @@ const login = async (req, res) => {
 
         res.json({ token, admin: adminForJson });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Login failed" });
+        console.error("Login Error:", error.message);
+        console.error("Stack:", error.stack);
+        res.status(500).json({ error: "Login failed", details: error.message });
     }
 };
 
@@ -86,6 +85,9 @@ const changePassword = async (req, res) => {
 };
 
 const createSubAdmin = async (req, res) => {
+    console.log("👤 createSubAdmin called");
+    console.log("User role:", req.user?.role);
+    console.log("Body:", req.body);
     // Security Check: Only Super Admin can create admins
     if (req.user?.role !== 'super-admin') {
         return res.status(403).json({ error: "Access Denied. Only Super Admin can perform this action." });

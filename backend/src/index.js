@@ -1,9 +1,18 @@
 const express = require('express');
 const cors = require('cors');
 const { PORT } = require('./config/env');
+
+// Import routes
 const authRoutes = require('./routes/authRoutes');
-const ticketRoutes = require('./routes/ticketRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const ticketRoutes = require('./routes/ticketRoutes');
+
+// Singleton Prisma Client
+const { PrismaClient } = require('@prisma/client');
+const prisma = global.prisma || new PrismaClient({
+    log: ['error'],
+});
+if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
 
 const app = express();
 
