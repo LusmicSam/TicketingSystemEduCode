@@ -1,66 +1,94 @@
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-export default function Toast({ message, type = 'info', onClose }) {
+export default function Toast({ message, type = 'info', onClose, duration = 4000 }) {
+    const [progress, setProgress] = useState(100);
+    const [isExiting, setIsExiting] = useState(false);
+
     useEffect(() => {
-        const timer = setTimeout(onClose, 4000);
-        return () => clearTimeout(timer);
-    }, [onClose]);
+        const startTime = Date.now();
+        const interval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const remaining = Math.max(0, 100 - (elapsed / duration) * 100);
+            setProgress(remaining);
 
-    const colors = {
+            if (remaining === 0) {
+                clearInterval(interval);
+                handleClose();
+            }
+        }, 50);
+
+        return () => clearInterval(interval);
+    }, [duration]);
+
+    const handleClose = () => {
+        setIsExiting(true);
+        setTimeout(onClose, 200);
+    };
+
+    const configs = {
         success: {
-            bg: 'bg-green-500/90',
-            icon: 'text-green-100',
-            iconComponent: CheckCircle,
-            progress: 'bg-green-200'
+            bg: 'bg-[var(--color-success)]',
+            icon: CheckCircle,
+            progressBg: 'bg-white/30'
         },
         error: {
-            bg: 'bg-red-500/90',
-            icon: 'text-red-100',
-            iconComponent: AlertCircle,
-            progress: 'bg-red-200'
+            bg: 'bg-[var(--color-error)]',
+            icon: AlertCircle,
+            progressBg: 'bg-white/30'
         },
         warning: {
-            bg: 'bg-yellow-500/90',
-            icon: 'text-yellow-100',
-            iconComponent: AlertTriangle,
-            progress: 'bg-yellow-200'
+            bg: 'bg-[var(--color-warning)]',
+            icon: AlertTriangle,
+            progressBg: 'bg-white/30'
         },
         info: {
-            bg: 'bg-blue-500/90',
-            icon: 'text-blue-100',
-            iconComponent: Info,
-            progress: 'bg-blue-200'
+            bg: 'bg-[var(--color-info)]',
+            icon: Info,
+            progressBg: 'bg-white/30'
         }
     };
 
-    const config = colors[type];
-    const IconComponent = config.iconComponent;
+    const config = configs[type];
+    const IconComponent = config.icon;
 
     return (
-        <div className={`${config.bg} backdrop-blur-xl text-white px-4 py-3 rounded-lg shadow-2xl animate-in slide-in-from-right-5 duration-300 min-w-[300px] max-w-[400px]`}>
-            <div className="flex items-center gap-3">
-                <IconComponent size={20} className={config.icon} />
-                <p className="flex-1 text-sm font-medium">{message}</p>
+        <div
+            className={`${config.bg} text-white rounded-[var(--radius-md)] shadow-lg min-w-[320px] max-w-[400px] overflow-hidden transition-all duration-200 ${isExiting ? 'opacity-0 translate-x-4 scale-95' : 'opacity-100 translate-x-0 scale-100'
+                }`}
+            style={{ animation: isExiting ? 'none' : 'slideInRight 0.3s ease-out' }}
+        >
+            <div className="px-4 py-3 flex items-center gap-3">
+                <div className="p-1 bg-white/20 rounded-full">
+                    <IconComponent size={18} />
+                </div>
+                <p className="flex-1 text-sm font-medium leading-tight">{message}</p>
                 <button
-                    onClick={onClose}
-                    className="hover:bg-white/20 rounded p-1 transition-colors"
+                    onClick={handleClose}
+                    className="p-1 hover:bg-white/20 rounded-full transition-colors"
                 >
                     <X size={16} />
                 </button>
             </div>
-            <div className="h-1 bg-white/20 mt-2 rounded-full overflow-hidden">
+
+            {/* Progress Bar */}
+            <div className="h-1 bg-black/10">
                 <div
-                    className={`h-full ${config.progress} rounded-full`}
-                    style={{
-                        animation: 'shrink 4s linear forwards'
-                    }}
+                    className={`h-full ${config.progressBg} transition-all duration-50 ease-linear`}
+                    style={{ width: `${progress}%` }}
                 />
             </div>
-            <style jsx>{`
-                @keyframes shrink {
-                    from { width: 100%; }
-                    to { width: 0%; }
+
+            <style>{`
+                @keyframes slideInRight {
+                    from {
+                        opacity: 0;
+                        transform: translateX(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateX(0);
+                    }
                 }
             `}</style>
         </div>

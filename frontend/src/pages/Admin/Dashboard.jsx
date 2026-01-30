@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { API_URL } from '../../config';
-import { Search, Filter, MessageCircle, ExternalLink, UserPlus, X, LogOut, CheckCircle, Clock, AlertCircle, Star, ArrowRightCircle, Divide, Loader, Lock } from 'lucide-react';
+import { Search, Filter, MessageCircle, ExternalLink, UserPlus, X, LogOut, CheckCircle, Clock, AlertCircle, Star, ArrowRightCircle, Divide, Loader, Lock, Sparkles, Moon, Sun } from 'lucide-react';
 import logo from '../../assets/educode_logo.png';
 import { useNavigate } from 'react-router-dom';
 import { useAlert } from '../../components/AlertContext';
+import { useTheme } from '../../components/ThemeContext';
 import TicketSkeleton from '../../components/TicketSkeleton';
 import EmptyState from '../../components/EmptyState';
+import { Button, Card, Badge } from '../../components/ui';
 
 export default function Dashboard() {
     const { showAlert, showToast } = useAlert();
+    const { isDarkMode, toggleTheme } = useTheme();
     const [tickets, setTickets] = useState([]);
     const [stats, setStats] = useState([]);
     const [filters, setFilters] = useState({ status: 'All', sortBy: 'newest', search: '' });
@@ -40,10 +43,10 @@ export default function Dashboard() {
     }, [adminUser]);
     const navigate = useNavigate();
 
-    // Theme Classes
-    const cardClass = "bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 shadow-xl";
-    const inputClass = "bg-slate-800/50 border border-slate-700 text-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none w-full";
-    const btnClass = "bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-all shadow-lg hover:shadow-indigo-500/25 flex items-center justify-center gap-2";
+    // Theme Classes - Using CSS Variables
+    const cardClass = "bg-[var(--color-surface)] rounded-[var(--radius-lg)] p-6 shadow-md border border-[var(--color-border)]";
+    const inputClass = "bg-[var(--color-surface)] border border-[var(--color-border)] theme-text rounded-[var(--radius-md)] px-4 py-3 focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none w-full transition-all";
+    const btnClass = "bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white px-4 py-2 rounded-[var(--radius-md)] font-medium transition-all shadow-lg hover:shadow-[var(--shadow-glow)] flex items-center justify-center gap-2";
 
     useEffect(() => {
         const token = localStorage.getItem('adminToken');
@@ -278,29 +281,43 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-200">
+        <div className="min-h-screen gradient-mesh theme-text">
+            {/* Decorative Orbs */}
+            <div className="orb orb-primary w-80 h-80 fixed top-0 left-0 animate-float"></div>
+            <div className="orb orb-secondary w-96 h-96 fixed bottom-20 right-10 animate-float" style={{ animationDelay: '1s' }}></div>
+
             {/* Navbar */}
-            <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
+            <nav className="theme-surface border-b theme-border sticky top-0 z-10">
                 <div className="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <img src={logo} alt="EduCode Logo" className="w-10 h-10 object-contain" />
-                        <span className="font-bold text-lg tracking-tight text-white">EduCode Admin</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="text-right hidden sm:block">
-                            <p className="text-sm font-medium text-white">{adminUser?.name || 'Admin'}</p>
-                            <p className="text-xs text-slate-400 capitalize">{adminUser?.role}</p>
+                        <div className="w-10 h-10 bg-[var(--color-primary)] rounded-[var(--radius-md)] flex items-center justify-center shadow-md">
+                            <img src={logo} alt="EduCode Logo" className="w-6 h-6 object-contain" />
                         </div>
+                        <span className="font-bold text-lg tracking-tight theme-text">EduCode Admin</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="text-right hidden sm:block">
+                            <p className="text-sm font-medium theme-text">{adminUser?.name || 'Admin'}</p>
+                            <p className="text-xs theme-text-muted capitalize">{adminUser?.role}</p>
+                        </div>
+                        {/* Theme Toggle */}
+                        <button
+                            onClick={toggleTheme}
+                            className="p-2.5 theme-surface-light rounded-xl theme-text-secondary hover:theme-text transition-all group"
+                            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                        >
+                            {isDarkMode ? <Sun size={20} className="text-amber-400 group-hover:rotate-180 transition-transform duration-500" /> : <Moon size={20} className="text-indigo-400" />}
+                        </button>
                         <button
                             onClick={() => setShowPasswordModal(true)}
-                            className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+                            className="p-2.5 theme-surface-light rounded-xl theme-text-secondary hover:theme-text transition-all"
                             title="Change Password"
                         >
                             <Lock size={20} />
                         </button>
                         <button
                             onClick={handleLogout}
-                            className="p-2 hover:bg-red-500/10 rounded-lg text-slate-400 hover:text-red-400 transition-colors"
+                            className="p-2.5 hover:bg-red-500/10 rounded-xl theme-text-secondary hover:text-red-400 transition-all"
                             title="Logout"
                         >
                             <LogOut size={20} />
@@ -309,12 +326,12 @@ export default function Dashboard() {
                 </div>
             </nav>
 
-            <main className="max-w-7xl mx-auto p-4 sm:p-8">
+            <main className="max-w-7xl mx-auto p-4 sm:p-8 relative">
                 {/* Header Actions */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                     <div>
-                        <h1 className="text-2xl font-bold text-white">Ticket Management</h1>
-                        <p className="text-slate-400 text-sm mt-1">Manage and resolve student enquiries.</p>
+                        <h1 className="text-3xl font-bold theme-text flex items-center gap-3">Ticket Management <Sparkles size={24} className="text-indigo-400 animate-bounce-subtle" /></h1>
+                        <p className="theme-text-muted text-sm mt-1">Manage and resolve student enquiries.</p>
                     </div>
                     {adminUser?.role === 'super-admin' && (
                         <button onClick={() => setShowCreateAdmin(true)} className={btnClass}>
@@ -325,24 +342,24 @@ export default function Dashboard() {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div className={`${cardClass} bg-indigo-900/20 border-indigo-500/30 flex items-center justify-between`}>
+                    <div className={`${cardClass} stat-card-primary flex items-center justify-between`}>
                         <div>
-                            <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Queries Resolved</p>
-                            <h3 className="text-3xl font-bold text-white mt-1">{myStats?.queriesResolved || 0}</h3>
+                            <p className="theme-text-muted text-sm font-medium uppercase tracking-wider">Queries Resolved</p>
+                            <h3 className="text-3xl font-bold theme-text mt-1">{myStats?.queriesResolved || 0}</h3>
                         </div>
-                        <div className="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400">
+                        <div className="icon-box icon-box-primary">
                             <CheckCircle size={24} />
                         </div>
                     </div>
-                    <div className={`${cardClass} bg-indigo-900/20 border-indigo-500/30 flex items-center justify-between`}>
+                    <div className={`${cardClass} stat-card-warning flex items-center justify-between`}>
                         <div>
-                            <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Average Rating</p>
-                            <h3 className="text-3xl font-bold text-white mt-1 flex items-center gap-2">
+                            <p className="theme-text-muted text-sm font-medium uppercase tracking-wider">Average Rating</p>
+                            <h3 className="text-3xl font-bold theme-text mt-1 flex items-center gap-2">
                                 {myStats?.averageRating ? (Number(myStats.averageRating).toFixed(1)) : 'N/A'}
-                                <Star size={20} className="text-yellow-400 fill-yellow-400" />
+                                <Star size={20} className="text-amber-500 fill-amber-500" />
                             </h3>
                         </div>
-                        <div className="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center text-yellow-500">
+                        <div className="icon-box icon-box-warning">
                             <Star size={24} />
                         </div>
                     </div>
@@ -354,9 +371,9 @@ export default function Dashboard() {
                     {/* My Tickets Toggle */}
                     <button
                         onClick={() => { setMyTicketsOnly(!myTicketsOnly); setShowInbox(false); setPagination({ ...pagination, page: 1 }); }}
-                        className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 border relative ${myTicketsOnly
-                            ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                        className={`px-4 py-2 rounded-[var(--radius-md)] font-medium transition-all flex items-center gap-2 border relative ${myTicketsOnly
+                            ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-white shadow-lg'
+                            : 'bg-[var(--color-surface)] border-[var(--color-border)] theme-text-secondary hover:theme-text'
                             }`}
                     >
                         <CheckCircle size={18} /> My Tickets
@@ -369,9 +386,9 @@ export default function Dashboard() {
 
                     <button
                         onClick={() => { setShowInbox(!showInbox); setMyTicketsOnly(false); setPagination({ ...pagination, page: 1 }); }}
-                        className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 border relative ${showInbox
-                            ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                        className={`px-4 py-2 rounded-[var(--radius-md)] font-medium transition-all flex items-center gap-2 border relative ${showInbox
+                            ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-white shadow-lg'
+                            : 'bg-[var(--color-surface)] border-[var(--color-border)] theme-text-secondary hover:theme-text'
                             }`}
                     >
                         <ArrowRightCircle size={18} /> Inbox
@@ -384,7 +401,7 @@ export default function Dashboard() {
 
                     {/* Search */}
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-3 text-slate-500" size={18} />
+                        <Search className="absolute left-3 top-3 theme-text-muted" size={18} />
                         <input
                             type="text"
                             placeholder="Search email..."
@@ -397,42 +414,42 @@ export default function Dashboard() {
                     {/* Filters Group */}
                     <div className="flex gap-4">
                         {/* Status */}
-                        <div className="flex items-center gap-2 bg-slate-800/50 rounded-lg px-3 border border-slate-700">
-                            <Filter size={16} className="text-slate-500" />
+                        <div className="flex items-center gap-2 bg-[var(--color-surface)] rounded-[var(--radius-md)] px-3 border border-[var(--color-border)]">
+                            <Filter size={16} className="theme-text-muted" />
                             <select
-                                className="bg-transparent text-slate-200 py-2 outline-none border-none cursor-pointer"
+                                className="bg-transparent theme-text py-2 outline-none border-none cursor-pointer"
                                 value={filters.status}
                                 onChange={(e) => { setFilters({ ...filters, status: e.target.value }); setPagination({ ...pagination, page: 1 }); }}
                             >
-                                <option value="All">All Status</option>
-                                <option value="Open">Open</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="Resolved">Resolved</option>
+                                <option value="All" className="theme-bg">All Status</option>
+                                <option value="Open" className="theme-bg">Open</option>
+                                <option value="In Progress" className="theme-bg">In Progress</option>
+                                <option value="Resolved" className="theme-bg">Resolved</option>
                             </select>
                         </div>
 
                         {/* Sort */}
-                        <div className="flex items-center gap-2 bg-slate-800/50 rounded-lg px-3 border border-slate-700">
-                            <Clock size={16} className="text-slate-500" />
+                        <div className="flex items-center gap-2 bg-[var(--color-surface)] rounded-[var(--radius-md)] px-3 border border-[var(--color-border)]">
+                            <Clock size={16} className="theme-text-muted" />
                             <select
-                                className="bg-transparent text-slate-200 py-2 outline-none border-none cursor-pointer"
+                                className="bg-transparent theme-text py-2 outline-none border-none cursor-pointer"
                                 value={filters.sortBy}
                                 onChange={(e) => { setFilters({ ...filters, sortBy: e.target.value }); setPagination({ ...pagination, page: 1 }); }}
                             >
-                                <option value="newest">Newest First</option>
-                                <option value="oldest">Oldest First</option>
+                                <option value="newest" className="theme-bg">Newest First</option>
+                                <option value="oldest" className="theme-bg">Oldest First</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 {/* Tickets List */}
-                <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+                <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-slate-200">
+                        <h2 className="text-2xl font-bold theme-text">
                             {myTicketsOnly ? 'My Tickets' : showInbox ? 'Inbox' : 'All Tickets'}
                         </h2>
-                        <p className="text-slate-400 text-sm">
+                        <p className="theme-text-muted text-sm">
                             {!isLoading && `${pagination.total} total`}
                         </p>
                     </div>
@@ -545,7 +562,7 @@ export default function Dashboard() {
 
                                             {ticket.user.whatsappNumber && (
                                                 <a
-                                                    href={`https://wa.me/${ticket.user.whatsappNumber.replace(/[^0-9]/g, '')}?text=Hi, regarding your support request #${ticket.id.slice(0, 8)}: "${ticket.description.slice(0, 40)}..."`}
+                                                    href={`https://wa.me/91${ticket.user.whatsappNumber.replace(/[^0-9]/g, '').slice(-10)}?text=Hi, regarding your support request #${ticket.id.slice(0, 8)}: "${ticket.description.slice(0, 40)}..."`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="bg-slate-800 hover:bg-green-600/20 hover:text-green-400 text-slate-400 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-slate-700 hover:border-green-500/30 flex items-center justify-center gap-2 w-full text-center"

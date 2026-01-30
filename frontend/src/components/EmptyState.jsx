@@ -1,4 +1,4 @@
-import { Inbox, FileQuestion, Search as SearchIcon } from 'lucide-react';
+import { Inbox, FileQuestion, Search as SearchIcon, PlusCircle, ArrowRight } from 'lucide-react';
 
 export default function EmptyState({
     type = 'no-tickets',
@@ -9,53 +9,70 @@ export default function EmptyState({
         'no-tickets': {
             icon: Inbox,
             title: 'No tickets yet',
-            description: 'Create your first ticket to get started with support',
+            description: 'Create your first support ticket to get started. Our team is ready to help!',
             actionLabel: 'Create Ticket',
-            showAction: true
+            showAction: true,
+            illustration: '📬'
         },
         'no-results': {
             icon: SearchIcon,
-            title: 'No tickets match your search',
-            description: 'Try adjusting your filters or search terms',
+            title: 'No matches found',
+            description: 'Try adjusting your search terms or filters to find what you\'re looking for.',
             actionLabel: 'Clear Filters',
-            showAction: true
+            showAction: true,
+            illustration: '🔍'
         },
         'all-done': {
             icon: Inbox,
             title: 'All caught up!',
-            description: 'No pending tickets in your queue',
-            showAction: false
+            description: 'You\'ve handled all your tickets. Great work!',
+            showAction: false,
+            illustration: '✨'
         },
         'inbox-empty': {
             icon: Inbox,
-            title: 'No pending transfers',
-            description: 'Your inbox is empty',
-            showAction: false
+            title: 'Inbox is empty',
+            description: 'No pending items in your queue right now.',
+            showAction: false,
+            illustration: '📭'
         }
     };
 
     const config = configs[type];
     const IconComponent = config.icon;
-    const textPrimary = isDarkMode ? 'text-slate-200' : 'text-gray-800';
-    const textSecondary = isDarkMode ? 'text-slate-400' : 'text-gray-500';
 
     return (
-        <div className="text-center py-16 px-4">
-            <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${isDarkMode ? 'bg-slate-800' : 'bg-gray-100'} mb-4`}>
-                <IconComponent size={32} className={textSecondary} />
+        <div className="text-center py-12 px-4 animate-fade-in">
+            {/* Illustration */}
+            <div className="relative inline-block mb-6">
+                <div className="text-6xl mb-2 animate-bounce-subtle" style={{ animationDuration: '3s' }}>
+                    {config.illustration}
+                </div>
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-2 bg-[var(--color-border)] rounded-full blur-sm opacity-50"></div>
             </div>
-            <h3 className={`text-xl font-semibold ${textPrimary} mb-2`}>
+
+            {/* Icon Badge */}
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--color-surface-hover)] border border-[var(--color-border)] mb-4">
+                <IconComponent size={24} className="theme-text-muted" />
+            </div>
+
+            {/* Text */}
+            <h3 className="text-xl font-semibold theme-text mb-2">
                 {config.title}
             </h3>
-            <p className={`${textSecondary} mb-6 max-w-md mx-auto`}>
+            <p className="theme-text-muted text-sm mb-6 max-w-sm mx-auto leading-relaxed">
                 {config.description}
             </p>
+
+            {/* Action Button */}
             {config.showAction && onAction && (
                 <button
                     onClick={onAction}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all shadow-lg hover:shadow-indigo-500/25"
+                    className="inline-flex items-center gap-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white px-5 py-2.5 rounded-[var(--radius-md)] font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg group"
                 >
+                    <PlusCircle size={18} />
                     {config.actionLabel}
+                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </button>
             )}
         </div>
