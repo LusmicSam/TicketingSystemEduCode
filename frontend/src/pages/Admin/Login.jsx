@@ -13,8 +13,15 @@ export default function AdminLogin() {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const { showAlert } = useAlert();
-    const { isDarkMode } = useTheme();
+    const { isDarkMode } = useTheme(); // Valid declaration
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('adminToken');
+        if (token) {
+            navigate('/sse/educode/ad/min/dashboard');
+        }
+    }, [navigate]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
