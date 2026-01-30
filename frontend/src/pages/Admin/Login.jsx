@@ -16,12 +16,24 @@ export default function AdminLogin() {
     const { isDarkMode } = useTheme(); // Valid declaration
     const navigate = useNavigate();
 
+    const [checkingAuth, setCheckingAuth] = useState(true);
+
     useEffect(() => {
         const token = localStorage.getItem('adminToken');
         if (token) {
-            navigate('/sse/educode/ad/min/dashboard');
+            navigate('/sse/educode/ad/min/dashboard', { replace: true });
+        } else {
+            setCheckingAuth(false);
         }
     }, [navigate]);
+
+    if (checkingAuth) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-900">
+                <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+            </div>
+        );
+    }
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -67,9 +79,7 @@ export default function AdminLogin() {
                 {/* Content */}
                 <div className="relative z-10 flex flex-col justify-center p-16">
                     <div className="flex items-center gap-4 mb-8">
-                        <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-500/30 animate-pulse-glow">
-                            <img src={logo} alt="EduCode" className="w-10 h-10 object-contain" />
-                        </div>
+                        <img src={logo} alt="EduCode" className="w-20 h-20 object-contain drop-shadow-lg" />
                         <div>
                             <h1 className="text-4xl font-bold theme-text">EduCode</h1>
                             <p className="text-indigo-400">Admin Portal</p>
