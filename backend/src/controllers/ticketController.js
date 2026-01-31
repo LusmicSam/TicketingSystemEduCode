@@ -100,9 +100,12 @@ const getTickets = async (req, res) => {
             where.status = status;
         }
         if (search) {
-            where.user = {
-                email: { contains: search, mode: 'insensitive' }
-            };
+            if (search) {
+                where.OR = [
+                    { user: { email: { contains: search, mode: 'insensitive' } } },
+                    { id: { contains: search, mode: 'insensitive' } }
+                ];
+            }
         }
         // My Tickets Filter
         const { assignedToMe, pendingForMe } = req.query;
@@ -264,7 +267,8 @@ const lockTicket = async (req, res) => {
             where: { id },
             data: {
                 status: 'In Progress',
-                resolvedById: adminId
+                resolvedById: adminId,
+                pendingTransferToId: null // Clear any pending transfer (e.g. from auto-assign)
             },
             include: { user: true, resolvedBy: { select: { name: true } } }
         });

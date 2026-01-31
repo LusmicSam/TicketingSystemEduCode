@@ -169,27 +169,12 @@ export default function Dashboard() {
         } catch (err) { showAlert('Error creating admin', 'error'); }
     };
 
-    const handleResolveTicket = async (ticketId) => {
-        if (!remark) return showAlert("Please enter a remark.", 'warning');
-        try {
-            const res = await fetch(`http://localhost:5000/api/tickets/${ticketId}/resolve`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                },
-                body: JSON.stringify({ status: 'Resolved', adminRemark: remark })
-            });
-            if (res.ok) {
-                setShowResolveModal(null);
-                setRemark('');
-                fetchTickets();
-                fetchStats(); // Update badge counts after resolving
-            }
-        } catch (err) { showAlert('Failed to resolve', 'error'); }
-    };
+    const [actionLoading, setActionLoading] = useState(null); // Ticket ID being processed
+
+    // ... (handlers update)
 
     const handleLockTicket = async (ticketId) => {
+        setActionLoading(ticketId);
         try {
             const res = await fetch(`${API_URL}/api/tickets/${ticketId}/lock`, {
                 method: 'PATCH',
@@ -197,16 +182,44 @@ export default function Dashboard() {
             });
             if (res.ok) {
                 fetchTickets();
-                fetchStats(); // Update badge counts after locking
+                fetchStats();
             }
             else showAlert('Failed to lock.', 'error');
         } catch (err) { showAlert('Error locking ticket', 'error'); }
+        setActionLoading(null);
+    };
+
+    const handleResolveTicket = async (ticketId) => {
+        if (!remark) return showAlert("Please enter a remark.", 'warning');
+        setActionLoading(ticketId); // Use modal ID or ticket ID
+        try {
+            // ... (fetch)
+            const res = await fetch(`${API_URL}/api/tickets/${ticketId}/resolve`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                },
+                body: JSON.stringify({ status: 'Resolved', adminRemark: remark })
+            });
+            // ...
+            if (res.ok) {
+                setShowResolveModal(null);
+                setRemark('');
+                fetchTickets();
+                fetchStats();
+            }
+        } catch (err) { showAlert('Failed to resolve', 'error'); }
+        setActionLoading(null);
     };
 
     const handleTransferTicket = async () => {
         if (!targetAdmin) return showAlert("Select an admin", 'warning');
+        const ticketId = showTransferModal;
+        setActionLoading(ticketId);
         try {
-            const res = await fetch(`${API_URL}/api/tickets/${showTransferModal}/transfer/initiate`, {
+            const res = await fetch(`${API_URL}/api/tickets/${ticketId}/transfer/initiate`, {
+                // ...
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -218,21 +231,37 @@ export default function Dashboard() {
                 setShowTransferModal(null);
                 setTargetAdmin('');
                 fetchTickets();
-                fetchStats(); // Update badge counts after transfer
+                fetchStats();
             } else showAlert('Transfer Failed', 'error');
         } catch (err) { showAlert('Error transferring ticket', 'error'); }
+        setActionLoading(null);
     };
 
     const handleAcceptTransfer = async (ticketId) => {
+        setActionLoading(ticketId);
         try {
             await fetch(`${API_URL}/api/tickets/${ticketId}/transfer/accept`, {
                 method: 'PATCH',
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
             });
             fetchTickets();
-            fetchStats(); // Update badge counts after accepting
+            fetchStats();
         } catch (err) { showAlert('Error accepting transfer', 'error'); }
+        setActionLoading(null);
     };
+
+    // ... (rendering)
+    {
+        ticket.status === 'Open' && (
+            <button
+                onClick={() => handleLockTicket(ticket.id)}
+                disabled={actionLoading === ticket.id}
+                className={`bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-lg hover:shadow-blue-500/20 flex items-center justify-center gap-2 w-full ${actionLoading === ticket.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                {actionLoading === ticket.id ? <Loader className="animate-spin" size={16} /> : <Clock size={16} />} Pick Up
+            </button>
+        )
+    }
 
     const handleRejectTransfer = async (ticketId) => {
         try {
@@ -628,9 +657,10 @@ export default function Dashboard() {
                                 </div>
                                 <button
                                     onClick={() => handleResolveTicket(showResolveModal)}
-                                    className={`${btnClass} w-full py-3 text-lg`}
+                                    disabled={actionLoading === showResolveModal}
+                                    className={`${btnClass} w-full py-3 text-lg ${actionLoading === showResolveModal ? 'opacity-50' : ''}`}
                                 >
-                                    <CheckCircle size={20} /> Mark as Resolved
+                                    {actionLoading === showResolveModal ? <Loader className="animate-spin" size={24} /> : <CheckCircle size={20} />} Mark as Resolved
                                 </button>
                             </div>
                         </div>
@@ -663,9 +693,10 @@ export default function Dashboard() {
                                 </div>
                                 <button
                                     onClick={handleTransferTicket}
-                                    className={`${btnClass} w-full py-3 text-lg`}
+                                    disabled={actionLoading === showTransferModal}
+                                    className={`${btnClass} w-full py-3 text-lg ${actionLoading === showTransferModal ? 'opacity-50' : ''}`}
                                 >
-                                    <ArrowRightCircle size={20} /> Transfer Ticket
+                                    {actionLoading === showTransferModal ? <Loader className="animate-spin" size={24} /> : <ArrowRightCircle size={20} />} Transfer Ticket
                                 </button>
                             </div>
                         </div>
