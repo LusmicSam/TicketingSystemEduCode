@@ -291,9 +291,7 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
             {/* Mobile Header */}
             <div className="md:hidden fixed top-0 left-0 right-0 bg-[var(--color-surface)] border-b border-[var(--color-border)] p-4 z-20 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-[var(--color-primary)] rounded-[var(--radius-md)] flex items-center justify-center">
-                        <img src={logo} alt="EduCode" className="w-5 h-5 object-contain" />
-                    </div>
+                    <img src={logo} alt="EduCode" className="w-8 h-8 object-contain drop-shadow-sm" />
                     <span className="font-semibold theme-text">EduCode</span>
                 </div>
                 <button onClick={() => setSidebarOpen(true)} className="theme-text p-2 hover:bg-[var(--color-surface-hover)] rounded-[var(--radius-sm)] transition-colors">
