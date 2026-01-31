@@ -23,26 +23,36 @@ const sendOtp = async (req, res) => {
 
     try {
         await transporter.sendMail({
-            from: `"EduCode Support" <${GMAIL_USER}>`,
+            from: `"TheEduCode Support" <${GMAIL_USER}>`,
             to: email,
-            subject: 'Your EduCode Login Code',
-            text: `Your EduCode verification code is: ${code}. Valid for 5 minutes.`,
+            subject: 'Your TheEduCode Login Verification',
+            text: `Your TheEduCode verification code is: ${code}. Valid for 5 minutes.`,
             html: `
-                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
-                    <div style="background-color: #0f172a; padding: 30px; text-align: center; border-bottom: 4px solid #6366f1;">
-                        <img src="cid:educode_logo" alt="EduCode" style="height: 50px; margin-bottom: 10px;" />
-                        <h1 style="color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 1px;">EduCode</h1>
+                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 16px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+                    <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); padding: 40px; text-align: center;">
+                        <img src="cid:educode_logo" alt="TheEduCode" style="height: 60px; margin-bottom: 15px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));" />
+                        <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">TheEduCode</h1>
+                        <p style="color: #a5b4fc; margin-top: 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Support Portal</p>
                     </div>
-                    <div style="padding: 40px; background-color: #f8fafc;">
-                        <p style="font-size: 16px; color: #334155; margin-bottom: 24px;">Hello,</p>
-                        <p style="font-size: 16px; color: #334155; line-height: 1.6;">Use the verification code below to securely login to your EduCode support portal:</p>
-                        <div style="background-color: #ffffff; border: 2px dashed #6366f1; padding: 20px; text-align: center; margin: 30px 0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-                            <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #4f46e5; font-family: monospace;">${code}</span>
+                    <div style="padding: 40px 30px; background-color: #fafafa;">
+                        <p style="font-size: 16px; color: #374151; margin-bottom: 24px; text-align: center;">Hello,</p>
+                        <p style="font-size: 16px; color: #4b5563; line-height: 1.6; text-align: center; margin-bottom: 30px;">
+                            We received a request to log in to your support account.<br>
+                            Use the code below to complete your verification:
+                        </p>
+                        
+                        <div style="background-color: #ffffff; border: 2px dashed #4f46e5; padding: 25px; text-align: center; margin: 0 auto 30px; max-width: 300px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1);">
+                            <span style="font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #4f46e5; font-family: 'Courier New', monospace; display: block;">${code}</span>
                         </div>
-                        <p style="font-size: 14px; color: #64748b; margin-top: 24px;">This code expires in 5 minutes. If you didn't request this, please ignore this email.</p>
+                        
+                        <p style="font-size: 14px; color: #6b7280; text-align: center; margin-top: 24px;">
+                            This code is valid for <strong>5 minutes</strong>. <br>
+                            If you did not request this, you can safely ignore this email.
+                        </p>
                     </div>
-                    <div style="background-color: #f1f5f9; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0;">
-                        &copy; ${new Date().getFullYear()} EduCode Inc. All rights reserved.
+                    <div style="background-color: #f3f4f6; padding: 24px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb;">
+                        <p style="margin: 0;">&copy; ${new Date().getFullYear()} TheEduCode Inc. All rights reserved.</p>
+                        <p style="margin: 8px 0 0;">Secure Automated System</p>
                     </div>
                 </div>
             `,

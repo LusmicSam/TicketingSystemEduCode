@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Analytics } from "@vercel/analytics/react"
 import TicketForm from './pages/Client/TicketForm';
 import Dashboard from './pages/Admin/Dashboard';
 import AdminLogin from './pages/Admin/Login';
@@ -8,6 +9,7 @@ import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 function App() {
   return (
     <ThemeProvider>
+      <Analytics />
       <Router>
         <div className="min-h-screen theme-bg theme-text font-sans transition-colors duration-300">
           <Routes>
