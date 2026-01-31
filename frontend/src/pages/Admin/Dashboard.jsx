@@ -251,17 +251,7 @@ export default function Dashboard() {
     };
 
     // ... (rendering)
-    {
-        ticket.status === 'Open' && (
-            <button
-                onClick={() => handleLockTicket(ticket.id)}
-                disabled={actionLoading === ticket.id}
-                className={`bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-lg hover:shadow-blue-500/20 flex items-center justify-center gap-2 w-full ${actionLoading === ticket.id ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-                {actionLoading === ticket.id ? <Loader className="animate-spin" size={16} /> : <Clock size={16} />} Pick Up
-            </button>
-        )
-    }
+
 
     const handleRejectTransfer = async (ticketId) => {
         try {
@@ -438,7 +428,7 @@ export default function Dashboard() {
                         <Search className="absolute left-3 top-3 theme-text-muted" size={18} />
                         <input
                             type="text"
-                            placeholder="Search email..."
+                            placeholder="Search..."
                             className={`${inputClass} pl-10`}
                             value={filters.search}
                             onChange={(e) => setFilters({ ...filters, search: e.target.value, status: filters.status, sortBy: filters.sortBy })} // Keep other filters
@@ -722,17 +712,13 @@ export default function Dashboard() {
 
                                 <div className="space-y-1">
                                     <label className="text-xs text-slate-400 uppercase font-semibold tracking-wider">Specialization</label>
-                                    <select
+                                    <input
+                                        type="text"
+                                        placeholder="Specialization (e.g. Technical, Billing)"
                                         className={inputClass}
                                         value={newAdmin.specialization}
                                         onChange={e => setNewAdmin({ ...newAdmin, specialization: e.target.value })}
-                                    >
-                                        <option value="General" className="bg-slate-900 text-slate-200">General Support</option>
-                                        <option value="Technical" className="bg-slate-900 text-slate-200">Technical</option>
-                                        <option value="Academic" className="bg-slate-900 text-slate-200">Academic</option>
-                                        <option value="Billing" className="bg-slate-900 text-slate-200">Billing</option>
-                                        <option value="Career" className="bg-slate-900 text-slate-200">Career Guidance</option>
-                                    </select>
+                                    />
                                 </div>
 
                                 <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg flex items-start gap-3">
