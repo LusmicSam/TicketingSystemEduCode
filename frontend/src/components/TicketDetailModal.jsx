@@ -2,7 +2,7 @@ import { X, Calendar, MessageSquare, User, Tag, Clock, CheckCircle, AlertCircle,
 import { useState } from 'react';
 import { Badge } from './ui';
 
-export default function TicketDetailModal({ ticket, onClose, onSubmitFeedback, isDarkMode }) {
+export default function TicketDetailModal({ ticket, onClose, onSubmitFeedback, email }) {
     const [feedbackData, setFeedbackData] = useState({ rating: 0, feedback: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -79,7 +79,7 @@ export default function TicketDetailModal({ ticket, onClose, onSubmitFeedback, i
                             <User size={16} className="theme-text-muted" />
                             <div>
                                 <p className="text-xs theme-text-muted">Email</p>
-                                <p className="text-sm theme-text font-medium truncate">{ticket.email}</p>
+                                <p className="text-sm theme-text font-medium truncate">{ticket.email || ticket.user?.email || email}</p>
                             </div>
                         </div>
                     </div>
@@ -128,8 +128,8 @@ export default function TicketDetailModal({ ticket, onClose, onSubmitFeedback, i
                                         <Star
                                             size={32}
                                             className={`transition-colors ${feedbackData.rating >= star
-                                                    ? 'text-amber-500 fill-amber-500'
-                                                    : 'text-[var(--color-border)] hover:text-amber-400'
+                                                ? 'text-amber-500 fill-amber-500'
+                                                : 'text-[var(--color-border)] hover:text-amber-400'
                                                 }`}
                                         />
                                     </button>

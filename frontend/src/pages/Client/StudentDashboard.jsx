@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import logo from '../../assets/educode_logo.png';
 import {
     LayoutDashboard, MessageSquare, Plus, CheckCircle, Clock, Star, LogOut, Menu, X,
-    Search, Filter, MessageCircle, Moon, Sun, Send, ChevronRight, ArrowRight, HelpCircle
+    Search, Filter, Moon, Sun, Send, ChevronRight, ArrowRight, HelpCircle, Loader2
 } from 'lucide-react';
 import { API_URL } from '../../config';
 import { useAlert } from '../../components/AlertContext';
@@ -83,7 +83,8 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                 setTickets(data);
                 setStats({
                     total: data.length,
-                    open: data.filter(t => t.status === 'Open' || t.status === 'In Progress').length,
+                    open: data.filter(t => t.status === 'Open').length,
+                    inProgress: data.filter(t => t.status === 'In Progress').length,
                     resolved: data.filter(t => t.status === 'Resolved').length
                 });
             }
@@ -95,21 +96,23 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
         if (!ticket.description.trim()) return showAlert("Please describe your issue.", 'warning');
         if (ticket.description.length < 10) return showAlert("Description must be at least 10 characters.", 'warning');
 
-        // Validate WhatsApp number if provided
-        if (ticket.whatsappNumber) {
-            const digitsOnly = ticket.whatsappNumber.replace(/[^0-9]/g, '');
-            const last10 = digitsOnly.slice(-10);
-            if (last10.length !== 10) {
-                return showAlert("Please enter a valid 10-digit phone number.", 'warning');
-            }
-            if (!ticket.consent) return showAlert("Please check the consent box.", 'warning');
+        // Validate WhatsApp number
+        if (!ticket.whatsappNumber) {
+            return showAlert("WhatsApp number is required.", 'warning');
         }
 
-        if (stats.open >= 5) return showAlert("You have reached the limit of 5 open tickets.", 'warning');
+        const digitsOnly = ticket.whatsappNumber.replace(/[^0-9]/g, '');
+        const last10 = digitsOnly.slice(-10);
+        if (last10.length !== 10) {
+            return showAlert("Please enter a valid 10-digit phone number.", 'warning');
+        }
+        if (!ticket.consent) return showAlert("Please check the consent box.", 'warning');
+
+        if ((stats.open + (stats.inProgress || 0)) >= 5) return showAlert("You have reached the limit of 5 open tickets.", 'warning');
 
         setIsSubmittingTicket(true);
         try {
-            const res = await fetch(`${API_URL}/api/tickets`, {
+            const res = await fetch(`${API_URL} /api/tickets`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...ticket, email: clientEmail }),
@@ -129,7 +132,7 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
     const handleSubmitFeedback = async (ticketId, feedbackData) => {
         if (feedbackData.rating === 0) return showAlert("Please select a star rating.", 'warning');
         try {
-            const res = await fetch(`${API_URL}/api/tickets/${ticketId}/feedback`, {
+            const res = await fetch(`${API_URL} /api/tickets / ${ticketId}/feedback`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(feedbackData)
@@ -225,7 +228,7 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                 {/* Navigation */}
                 <nav className="p-3 space-y-1 flex-1">
                     <NavButton icon={LayoutDashboard} label="Overview" tab="overview" />
-                    <NavButton icon={MessageSquare} label="My Tickets" tab="tickets" badge={stats.open} />
+                    <NavButton icon={MessageSquare} label="My Tickets" tab="tickets" badge={stats.open + (stats.inProgress || 0)} />
                     <NavButton icon={Plus} label="New Ticket" tab="new" />
                     <NavButton icon={HelpCircle} label="Help & FAQ" tab="help" />
 
@@ -299,7 +302,7 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                             {/* Welcome Banner */}
                             <WelcomeBanner
                                 userEmail={clientEmail}
-                                stats={{ resolved: stats.resolved, pending: stats.open }}
+                                stats={{ resolved: stats.resolved, pending: stats.open + (stats.inProgress || 0) }}
                             />
 
                             {/* Announcements */}
@@ -309,10 +312,11 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                             {isLoading ? (
                                 <TicketSkeleton variant="stat" />
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                                    <StatCard label="Total Tickets" value={stats.total} icon={MessageSquare} variant="primary" delay={1} />
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                                    <StatCard label="Total" value={stats.total} icon={MessageSquare} variant="primary" delay={1} />
                                     <StatCard label="Resolved" value={stats.resolved} icon={CheckCircle} variant="success" delay={2} />
-                                    <StatCard label="Pending" value={stats.open} icon={Clock} variant="warning" delay={3} />
+                                    <StatCard label="Open" value={stats.open} icon={Clock} variant="warning" delay={3} />
+                                    <StatCard label="In Progress" value={stats.inProgress || 0} icon={Loader2} variant="info" delay={4} />
                                 </div>
                             )}
 
@@ -397,7 +401,10 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                                     <h2 className="text-2xl font-semibold theme-text">My Tickets</h2>
                                     <p className="theme-text-muted text-sm mt-1">View and manage your support history.</p>
                                 </div>
-                                <Button onClick={() => setActiveTab('new')} size="sm" className="btn-glow active:scale-95 transition-transform"><Plus size={16} /> New Ticket</Button>
+                                <div className="flex items-center gap-2">
+                                    <RefreshButton onClick={fetchTickets} isLoading={isLoading} />
+                                    <Button onClick={() => setActiveTab('new')} size="sm" className="btn-glow active:scale-95 transition-transform"><Plus size={16} /> New Ticket</Button>
+                                </div>
                             </header>
 
                             {/* Filters */}
@@ -547,7 +554,7 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                                 <div className="p-4 rounded-[var(--radius-md)] bg-[var(--color-surface-hover)] border border-[var(--color-border)]">
                                     <label className="text-sm font-medium theme-text mb-3 flex items-center gap-2">
                                         <MessageCircle size={16} className="text-[var(--color-primary)]" />
-                                        WhatsApp Updates (Optional)
+                                        WhatsApp Updates (Required)
                                     </label>
                                     <div className="space-y-3 mt-3">
                                         <div className="flex">
@@ -649,6 +656,7 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                     onClose={() => setSelectedTicket(null)}
                     onSubmitFeedback={handleSubmitFeedback}
                     isDarkMode={isDarkMode}
+                    email={clientEmail}
                 />
             )}
 
