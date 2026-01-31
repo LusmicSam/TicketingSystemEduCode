@@ -145,8 +145,9 @@ function TicketFormContent() {
             <div className="w-full lg:w-1/2 theme-bg flex items-center justify-center p-8">
                 <div className="w-full max-w-md relative">
                     {/* Mobile Logo */}
+                    {/* Mobile Logo */}
                     <div className="lg:hidden text-center mb-8">
-                        <img src={logo} alt="TheEduCode" className="w-16 h-16 object-contain drop-shadow-sm mb-4" />
+                        <img src={logo} alt="TheEduCode" className="w-16 h-16 object-contain drop-shadow-sm mb-4 mx-auto" />
                         <h1 className="text-2xl font-bold theme-text">TheEduCode Support</h1>
                     </div>
 
