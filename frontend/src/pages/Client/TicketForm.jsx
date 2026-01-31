@@ -61,6 +61,7 @@ function TicketFormContent() {
             const data = await res.json();
             if (res.ok) {
                 localStorage.setItem('clientEmail', email);
+                localStorage.setItem('clientToken', data.token);
                 setIsVerified(true);
             } else {
                 showAlert(data.error || 'Verification failed', 'error');
@@ -74,6 +75,7 @@ function TicketFormContent() {
 
     const handleLogout = () => {
         localStorage.removeItem('clientEmail');
+        localStorage.removeItem('clientToken');
         setIsVerified(false);
         setEmail('');
         setOtp('');

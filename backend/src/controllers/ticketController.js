@@ -2,20 +2,21 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const createTicket = async (req, res) => {
-    const { category, description, email, whatsappNumber } = req.body;
+    const { category, description, whatsappNumber, consent } = req.body;
+    const email = req.user.email; // Secure email from token
 
-    if (!email || !whatsappNumber) {
-        return res.status(400).json({ error: "Email and WhatsApp Number are required" });
+    if (!whatsappNumber) {
+        return res.status(400).json({ error: "WhatsApp Number is required" });
     }
 
     try {
-        // Ghost User Logic: Find or Create
-        let user = await prisma.user.findUnique({ where: { email } });
-        if (!user) {
-            user = await prisma.user.create({ data: { email, whatsappNumber } });
-        } else {
-            // Always update WhatsApp if user exists
-            await prisma.user.update({
+        // Find existing user (guaranteed by auth middleware, but we need the ID)
+        // Actually, req.user IS the user object from middleware (Prisma Object)
+        let user = req.user;
+
+        // Update WhatsApp if different
+        if (user.whatsappNumber !== whatsappNumber) {
+            user = await prisma.user.update({
                 where: { email },
                 data: { whatsappNumber }
             });
@@ -151,8 +152,8 @@ const getTickets = async (req, res) => {
 };
 
 const getTicketHistory = async (req, res) => {
-    const { email } = req.query;
-    if (!email) return res.status(400).json({ error: "Email required" });
+    const email = req.user.email; // Secure from token
+    // if (!email) ... unnecessary as token guarantees validation
 
     try {
         const tickets = await prisma.ticket.findMany({

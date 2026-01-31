@@ -77,7 +77,10 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
     const fetchTickets = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/api/tickets/history?email=${clientEmail}`);
+            const token = localStorage.getItem('clientToken');
+            const res = await fetch(`${API_URL}/api/tickets/history?email=${clientEmail}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setTickets(data);
@@ -87,6 +90,9 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
                     inProgress: data.filter(t => t.status === 'In Progress').length,
                     resolved: data.filter(t => t.status === 'Resolved').length
                 });
+            } else if (res.status === 401) {
+                showAlert('Session expired. Please login again.', 'error');
+                onLogout();
             }
         } catch (err) { console.error(err); showAlert('Failed to fetch tickets', 'error'); }
         finally { setLoading(false); }
@@ -112,9 +118,13 @@ export default function StudentDashboard({ clientEmail, onLogout }) {
 
         setIsSubmittingTicket(true);
         try {
-            const res = await fetch(`${API_URL} /api/tickets`, {
+            const token = localStorage.getItem('clientToken');
+            const res = await fetch(`${API_URL}/api/tickets`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ ...ticket, email: clientEmail }),
             });
             if (res.ok) {
