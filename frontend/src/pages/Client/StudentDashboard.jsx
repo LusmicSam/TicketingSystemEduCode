@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import logo from '../../assets/educode_logo.png';
 import {
     LayoutDashboard, MessageSquare, Plus, CheckCircle, Clock, Star, LogOut, Menu, X,
-    Search, Filter, Moon, Sun, Send, ChevronRight, ArrowRight, HelpCircle, Loader2
+    Search, Filter, Moon, Sun, Send, ChevronRight, ArrowRight, HelpCircle, Loader2, MessageCircle
 } from 'lucide-react';
 import { API_URL } from '../../config';
 import { useAlert } from '../../components/AlertContext';
