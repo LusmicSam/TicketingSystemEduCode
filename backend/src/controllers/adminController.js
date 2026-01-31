@@ -174,7 +174,7 @@ const getStats = async (req, res) => {
 const getAllAdmins = async (req, res) => {
     try {
         const admins = await prisma.admin.findMany({
-            select: { id: true, name: true, email: true }
+            select: { id: true, name: true, email: true, specialization: true }
         });
         const adminsJson = JSON.parse(JSON.stringify(admins, (key, value) =>
             typeof value === 'bigint' ? value.toString() : value

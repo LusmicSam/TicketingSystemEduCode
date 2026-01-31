@@ -161,7 +161,8 @@ export default function Dashboard() {
             if (res.ok) {
                 showToast('Sub Admin Added!', 'success');
                 setShowCreateAdmin(false);
-                setNewAdmin({ name: '', email: '', password: '' });
+                setNewAdmin({ name: '', email: '', password: '', specialization: '' });
+                fetchAdmins(true);
             } else {
                 const err = await res.json();
                 showAlert(err.error || 'Failed', 'error');
@@ -677,7 +678,9 @@ export default function Dashboard() {
                                     >
                                         <option value="" className="bg-slate-900 text-slate-200">Select Admin...</option>
                                         {admins && adminUser && admins.filter(a => String(a.id) !== String(adminUser.id)).map(admin => (
-                                            <option key={admin.id} value={admin.id} className="bg-slate-900 text-slate-200">{admin.name} ({admin.email})</option>
+                                            <option key={admin.id} value={admin.id} className="bg-slate-900 text-slate-200">
+                                                {admin.name} ({admin.specialization || 'General'})
+                                            </option>
                                         ))}
                                     </select>
                                 </div>
@@ -710,15 +713,36 @@ export default function Dashboard() {
                                 <input type="email" placeholder="Email Address" className={inputClass} required value={newAdmin.email} onChange={e => setNewAdmin({ ...newAdmin, email: e.target.value })} />
                                 <input type="password" placeholder="Password" className={inputClass} required value={newAdmin.password} onChange={e => setNewAdmin({ ...newAdmin, password: e.target.value })} />
 
-                                <div className="space-y-1">
-                                    <label className="text-xs text-slate-400 uppercase font-semibold tracking-wider">Specialization</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Specialization (e.g. Technical, Billing)"
-                                        className={inputClass}
-                                        value={newAdmin.specialization}
-                                        onChange={e => setNewAdmin({ ...newAdmin, specialization: e.target.value })}
-                                    />
+                                <div className="space-y-2">
+                                    <label className="text-xs text-slate-400 uppercase font-semibold tracking-wider">Specialization (Select Multiple)</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {['Technical Support', 'Course Enquiry', 'Access Issue', 'Report a Bug', 'Feedback / Suggestion', 'Other'].map(option => {
+                                            const isSelected = newAdmin.specialization.split(', ').includes(option);
+                                            return (
+                                                <button
+                                                    key={option}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const current = newAdmin.specialization ? newAdmin.specialization.split(', ').filter(s => s) : [];
+                                                        let updated;
+                                                        if (current.includes(option)) {
+                                                            updated = current.filter(s => s !== option);
+                                                        } else {
+                                                            updated = [...current, option];
+                                                        }
+                                                        setNewAdmin({ ...newAdmin, specialization: updated.join(', ') });
+                                                    }}
+                                                    className={`text-xs py-2 px-3 rounded-lg border transition-all text-left truncate ${isSelected
+                                                        ? 'bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                                                        : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600 hover:bg-slate-700/50'
+                                                        }`}
+                                                >
+                                                    {option}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-1">Selected: <span className="text-indigo-400">{newAdmin.specialization || 'None'}</span></p>
                                 </div>
 
                                 <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg flex items-start gap-3">
